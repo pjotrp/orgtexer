@@ -1,0 +1,81 @@
+#! /usr/bin/env ruby
+#
+# Author:: Pjotr Prins
+# Copyright:: 2015
+# License:: BSD License
+
+rootpath = File.dirname(File.dirname(__FILE__))
+$: << rootpath+'/lib' << rootpath + '/contrib/rbib/lib'
+
+require 'optparse'
+require 'ostruct'
+# require 'bibtex'
+# require 'control/wikitexer'
+# require 'output/wtlatex'
+# require 'output/wthtml'
+# require 'input/wtparser'
+require 'orgtexer'
+
+ORGTEXER_VERSION = File.dirname(File.dirname(__FILE__))+'/VERSION'
+ORGTEXER_SHOW = 'OrgTeXer '+File.new(ORGTEXER_VERSION).read+' by Pjotr Prins (c) 2015'
+
+bib_style = {}
+style = {}
+parse_bib = true
+
+options = OpenStruct.new()
+opts1 = OptionParser.new() { |opts|
+  opts.on_tail("-h", "--help", "Show help and examples") {
+    print(opts)
+    print <<EXAMPLE
+
+Examples:
+
+For a full description see https://github.com/pjotrp/orgtexer
+
+EXAMPLE
+
+    exit()
+  }
+  
+  opts.on("--latex", "generate LaTeX output") do |b|
+    options.outputtype = LATEX
+  end
+
+  opts.on("--html", "generate HTML output") do |b|
+    options.outputtype = HTML
+  end
+
+  opts.on("--final", "Final version (disable special formatting)") do
+    bib_style[:final] = true
+    style[:final] = true
+  end
+
+  opts.on("-q", "--quiet", "Run quietly") do |q|
+    options.quiet = q
+  end
+
+  opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+    options.verbose = v
+  end
+
+  opts.on("-t", "--[no-]trace", "Debug") do |t|
+    options.trace = t
+  end
+
+}
+opts = opts1
+opts.parse!(ARGV)
+
+$stderr.print ORGTEXER_SHOW,"\n" if not options.quiet and !options.use_stdin
+
+raise 'I can not use both stdin and input files' if options.use_stdin and ARGV.size > 0 
+
+document = Document.new
+
+ARGV.each do | fn |
+  File.open(fn,"r:iso-8859-1:utf-8",&:read).each_line do | s |
+    if s
+  end
+end
+

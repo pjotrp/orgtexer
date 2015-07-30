@@ -1,0 +1,14 @@
+* ORGTeXer
+
+A processor for orgtex-mode - this is Org with TeX mixed in.
+
+The reason for this processor is that I often write text in Emacs Org
+mode and want output as LaTeX or HTML. These, in turn, can be
+converted to PDF or Word documents for collaborators. ORGTeXer also
+has support for bibtex citations.
+
+There exists also the older wikitexer project which did the same for
+Wikimedia style input files mixed with Tex. Both projects are
+published under a liberal BSD-style license.
+
+Pjotr Prins.
