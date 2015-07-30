@@ -71,11 +71,21 @@ $stderr.print ORGTEXER_SHOW,"\n" if not options.quiet and !options.use_stdin
 
 raise 'I can not use both stdin and input files' if options.use_stdin and ARGV.size > 0 
 
-document = Document.new
+include ORGTeXer
 
+blocks = []
 ARGV.each do | fn |
-  File.open(fn,"r:iso-8859-1:utf-8",&:read).each_line do | s |
-    if s
+  block = []
+  File.open(fn,"r:iso-8859-1:utf-8",&:read).each_line do | line |
+    # Create blocks from newline separated paragraphs
+    if line != "\n"
+      block << line.chomp
+    else
+      blocks << block
+      block = []
+    end
   end
 end
+processed_blocks = Input::process(blocks)
 
+HTMLOut::generate(processed_blocks)

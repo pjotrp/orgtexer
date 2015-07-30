@@ -1,0 +1,27 @@
+* OrgTeXer design document
+
+OrgTeXer takes a functional approach of processing documents,
+transforming inputs into outputs.
+
+Basically functions are written in LaTeX style, e.g., \cite{paper}
+will (lazily) call the Ruby cite function in scope and pass 'paper' in
+as an argument. If the function does not exist, the text is simply 
+ignored and passed through (useful for complex LaTeX functions).
+
+Another design point is that the input is chunked to generate output.
+These chunks can be processed in parallel and output collated as long
+as the end-state does not differ between chunks - typically when the
+environment stack drops to the same level. The environment stack
+operates also within paragraphs.
+
+In the first round comments are processed out.
+
+In the second round environments are discovered and pushed on the
+environment stack. Text is chunked between and within environments,
+i.e., the start of the chunk and the end of the chunk can have a
+different environment state. An environment starts with \begin{...}
+and ends with \end{...}. The math environment is simply sugar. We
+can't chunk without knowing the environment state.
+
+In the third round functions are called and text replaced by their
+functions. The chunks can be processed in parallel.
