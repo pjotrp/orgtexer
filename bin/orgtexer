@@ -9,11 +9,6 @@ $: << rootpath+'/lib' << rootpath + '/contrib/rbib/lib'
 
 require 'optparse'
 require 'ostruct'
-# require 'bibtex'
-# require 'control/wikitexer'
-# require 'output/wtlatex'
-# require 'output/wthtml'
-# require 'input/wtparser'
 require 'orgtexer'
 
 ORGTEXER_VERSION = File.dirname(File.dirname(__FILE__))+'/VERSION'
@@ -86,6 +81,7 @@ ARGV.each do | fn |
     end
   end
 end
-processed_blocks = Input::process(blocks)
 
-HTMLOut::generate(processed_blocks)
+preprocessed = Input::preprocess(blocks)
+org_processed = Input::Org::process(preprocessed)
+HTML::generate(org_processed)

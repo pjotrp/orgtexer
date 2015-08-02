@@ -1,14 +1,42 @@
 * ORGTeXer
 
-A processor for orgtex-mode - this is Org with TeX mixed in.
+A processor for orgtex-mode - this is Org with TeX mixed in. Actually
+it is more than that. I have come to realise that we need front-ends
+for processing markdown, Org and all that, and 'knowledgable'
+back-ends that can target either TeX or HTML. And the front-end can
+act based on knowledge of the target. Either that or create a very
+smart Tex -> HTML converter, something no one has achieved in a
+satisfactory way (that I am aware). 
 
 The reason for this processor is that I often write text in Emacs Org
-mode and want output as LaTeX or HTML. These, in turn, can be
-converted to PDF or Word documents for collaborators. ORGTeXer also
-has support for bibtex citations.
+mode (before it was Markdown or WikiTeXer with vim) and usually want
+output as LaTeX or HTML. These, in turn, can be converted to PDF or
+Word documents for collaborators.
 
-There exists also the older wikitexer project which did the same for
-Wikimedia style input files mixed with Tex. Both projects are
-published under a liberal BSD-style license.
+I know Org can also output HTML and TeX, but somehow it is never what
+I want. I need something hackable. DocBook is another options - but
+there is little love lost between XML and me. I prefer transformers
+that are source code and skip the intermediate presentation(s).
+
+The general idea of OrgTeXer is to create convenience methods for
+transforming Org-style markdown to TeX or HTML. Anything that is not
+recognized is basically passed through. That means you can use TeX in
+TeX targeted documents and you can use HTML in HTML targeted
+documents. I used this methodology to write almost all my papers and
+my PhD thesis.
+
+OrgTeXer also requires support for bibtex
+citations. Maybe I'll use Org-ref for that. The good news is that the
+software stack arond Org-mode is getting more and more sophisticated
+and increasingly used. One thing that bothers me, however, is that
+they are not command line tools.
+
+There exists also the older WikiTeXer project which did the same for
+Wikimedia style input files mixed with Tex. The architecture for both
+projects is quite different. OrgTeXer will be a 'pipe' based system
+with small transformers doing small jobs. The current version is
+written in Ruby, but I may change it to something LISPier soon.
+
+OrgTeXer is published under a liberal BSD-style license.
 
 Pjotr Prins.
