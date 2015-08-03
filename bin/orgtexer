@@ -84,4 +84,6 @@ end
 
 preprocessed = Input::preprocess(blocks)
 org_processed = Input::Org::process(preprocessed)
-HTML::generate(org_processed)
+org_titles = Input::Org::titles_to_wtex(org_processed)
+Output::generate(org_titles)
+# HTML::generate(org_processed)

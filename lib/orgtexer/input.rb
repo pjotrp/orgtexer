@@ -21,6 +21,19 @@ module ORGTeXer
     end
 
     module Org
+      def Org::titles_to_wtex(blocks)
+        blocks.map { |block|
+          block.map { |line|
+            if line =~ /^(\*+)/
+              replacewith = '='*$1.size
+              replacewith + ' ' + $' + ' ' + replacewith
+            else
+              line
+            end
+          }
+        }
+      end
+      
       def Org::process(blocks)
         blocks
       end
