@@ -50,6 +50,8 @@ $stderr.print ORGTEXER_SHOW,"\n" if not options.quiet
 
 include ORGTeXer
 
+$stderr.print Encoding.default_external
+
 biblist = {}
 lines = []
 
