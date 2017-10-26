@@ -1,0 +1,113 @@
+#! /usr/bin/env ruby
+
+rootpath = File.dirname(File.dirname(__FILE__))
+$: << rootpath+'/lib' << rootpath + '/contrib/rbib/lib'
+
+require 'optparse'
+require 'ostruct'
+require 'orgtexer'
+require 'bibtex'
+require 'bibtex/bibformatters'
+
+ORGTEXER_VERSION = File.dirname(File.dirname(__FILE__))+'/VERSION'
+ORGTEXER_SHOW = 'BibTexOrg '+File.new(ORGTEXER_VERSION).read+' by Pjotr Prins (c) 2017'
+
+bib_style = {}
+style = { format: :springer}
+
+options = OpenStruct.new()
+opts1 = OptionParser.new() { |opts|
+  opts.on_tail("-h", "--help", "Show help and examples") {
+    print(opts)
+    print <<EXAMPLE
+
+Examples:
+
+For a full description see https://github.com/pjotrp/orgtexer
+
+EXAMPLE
+
+    exit()
+  }
+
+  opts.on("-q", "--quiet", "Run quietly") do |q|
+    options.quiet = q
+  end
+
+  opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+    options.verbose = v
+  end
+
+  opts.on("-t", "--[no-]trace", "Debug") do |t|
+    options.trace = t
+  end
+
+}
+opts = opts1
+opts.parse!(ARGV)
+
+$stderr.print ORGTEXER_SHOW,"\n" if not options.quiet
+
+include ORGTeXer
+
+biblist = {}
+lines = []
+
+ARGV.each do | fn |
+  if fn =~ /.bib$/
+    Bibtex::Parser.parse(fn).map do |entry|
+      biblist[entry.key] = entry
+    end
+    next
+  end
+  File.open(fn,"r:iso-8859-1:utf-8",&:read).each_line do | s |
+    lines << s;
+  end
+end
+
+class HTMLwriter
+  def bold s
+    "<b>"+s+"</b"
+  end
+end
+
+citations = {}
+
+lines.each do |line|
+  if line =~ /^\#\+REFERENCES/
+    print "<h1>REFERENCES</h1>\n"
+    writer = HTMLwriter.new
+    bibformatter = BibFormatter::get_formatter(writer,style)
+    citations.each do | ref, count |
+      if !biblist[ref]
+        $stderr.print "No reference found for #{ref}!"
+      else
+        bib = biblist[ref]
+        text = bibformatter.write(bib)
+        marker = bibformatter.reference_marker(ref)
+        print "\n#{marker} #{text}<br />\n"
+      end
+    end
+    next
+  end
+  nline = line
+  count = 0
+  while nline =~ /\\cite\{([^}]+)\}/
+    tags = $1
+    repl = "\\cite{"+tags+"}"
+    $stderr.print repl,"\n"
+    nline.sub!(repl,"~#{tags}~")
+    tags.split(/[,\s]+/).each { |tag|
+      if !citations[tag]
+        citations[tag] = 1
+      else
+        citations[tag] += 1
+      end
+    }
+    count += 1
+    break if count>100 # prevent endless loops if non-resolved
+  end
+  print nline
+end
+
+p citations
