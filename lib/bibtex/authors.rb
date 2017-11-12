@@ -2,24 +2,35 @@
 module FormatBibAuthors
 
   # Create a list of author names, so it is 'lastname, firstname(s)'
+  # See also https://web.archive.org/web/20130620150431/http://amath.colorado.edu/documentation/LaTeX/reference/faq/bibstyles.html
+  # We also allow for the 'malformed' {Ball MP, Bobe JR, Chou MF} style for authors
   def split_bib_authors list
     authors = []
     if list.kind_of?(String)
-      strip_bibtex(list).split(/ and /).each do | s |
-        s2 = 
-          if s !~ /,/
-            # No comma! 
-            first,last = s.split(/\s+/,2)
-            if first and not last
-              first
+      if list =~ / and / or list =~ /\./
+        strip_bibtex(list).split(/ and /).each do | s |
+          s2 =
+            if s !~ /,/
+              # No comma!
+              first,last = s.split(/\s+/,2)
+              if first and not last
+                first
+              else
+                raise 'Problem with bib name containing comma <'+s+'>' if not first and not last
+                last + ', '+first
+              end
             else
-              raise 'Problem with bib name <'+s+'>' if not first and not last
-              last + ', '+first
+              s
             end
-          else
-            s
-          end
-        authors.push s2
+          authors.push s2
+        end
+      else
+        strip_bibtex(list).split(/, /).each do | s |
+          last,first = s.split(/\s+/,2)
+          firsts = first.split(//).join(". ")+"."
+          # $stderr.print firsts, "\n"
+          authors.push last + ', '+firsts
+        end
       end
       authors
     else
@@ -42,5 +53,3 @@ module FormatBibAuthors
     res
   end
 end
-
-

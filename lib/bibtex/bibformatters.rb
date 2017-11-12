@@ -310,8 +310,11 @@ class BibSpringerFormatter
     list = split_bib_authors(s)
     list = list.map do | a |
       first,last = split_first_lastname(a)
-      if first !~ /\./ or first =~ /\w\w/
-        $stderr.print "Possibly malformed name <#{first}> in ref <",a,">\n"
+      if first !~ /\./
+        $stderr.print "Possibly malformed first name <#{first.strip}> has no dot in <",a,">\n"
+      end
+      if first =~ /\w\w/
+        $stderr.print "Possibly malformed first name <#{first.strip}> contains two+ letters in ref <",a,">\n"
       end
       a1 = last+' '+to_initials(first)
       a2 = a1.gsub(/[,.]/,' ')
