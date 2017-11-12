@@ -74,20 +74,23 @@ class HTMLwriter
 end
 
 citations = {}
+refnum = 1
 
 lines.each do |line|
   if line =~ /^\#\+REFERENCES/
-    print "<h1>REFERENCES</h1>\n"
+    # ---- Inject the references into the text
+    # print "<h1>REFERENCES</h1>\n"
     writer = HTMLwriter.new
     bibformatter = BibFormatter::get_formatter(writer,style)
-    citations.each do | ref, count |
+    citations.each do | ref, rec |
+      refnum = [:refnum]
       if !biblist[ref]
         $stderr.print "No reference found for #{ref}!"
       else
         bib = biblist[ref]
         text = bibformatter.write(bib)
         marker = bibformatter.reference_marker(ref)
-        print "\n#{marker} #{text}<br />\n"
+        print "\n<span title=\"#{marker}\"><b>[#{rec[:refnum]}]</b></span> #{text}<br />\n"
       end
     end
     next
@@ -96,20 +99,24 @@ lines.each do |line|
   count = 0
   while nline =~ /\\cite\{([^}]+)\}/
     tags = $1
-    repl = "\\cite{"+tags+"}"
-    $stderr.print repl,"\n"
-    nline.sub!(repl,"~#{tags}~")
-    tags.split(/[,\s]+/).each { |tag|
+    $stderr.print "Found citations: ",tags,"\n"
+
+    result = tags.split(/[,\s]+/).map { |tag|
       if !citations[tag]
-        citations[tag] = 1
+        citations[tag] = { refnum: refnum, count: 1 }
+        refnum += 1
       else
-        citations[tag] += 1
+        citations[tag][:count] += 1
       end
+      refnum
     }
+    repl = "\\cite{"+tags+"}"
+    nline.sub!(repl,"<span title=\"#{tags}\"><b>[#{result.join(',')}]</b></span>")
+
     count += 1
     break if count>100 # prevent endless loops if non-resolved
   end
   print nline
 end
 
-p citations
+$stderr.p citations if options.debug

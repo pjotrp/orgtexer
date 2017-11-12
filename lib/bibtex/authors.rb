@@ -3,6 +3,10 @@ module FormatBibAuthors
 
   # Create a list of author names, so it is 'lastname, firstname(s)'
   # See also https://web.archive.org/web/20130620150431/http://amath.colorado.edu/documentation/LaTeX/reference/faq/bibstyles.html
+  # There are really two styles:
+  # {M{\"o}ller, Steffen and Afgan, Enis and Banck, Michael and Bonnal, Raoul JP and ...}
+  # and
+  # {{M{\"o}ller, S. and Afgan, E. and Banck, M. and Bonnal, R. J. P. and ...}
   # We also allow for the 'malformed' {Ball MP, Bobe JR, Chou MF} style for authors
   def split_bib_authors list
     authors = []
@@ -20,11 +24,13 @@ module FormatBibAuthors
                 last + ', '+first
               end
             else
+              # Looks like 'Bonnal, R. J. P.' or 'Bonnal, Raoul JP'
               s
             end
           authors.push s2
         end
       else
+        # Looks like misformed 'Ball MP'
         strip_bibtex(list).split(/, /).each do | s |
           last,first = s.split(/\s+/,2)
           firsts = first.split(//).join(". ")+"."
