@@ -90,7 +90,7 @@ lines.each do |line|
         bib = biblist[ref]
         text = bibformatter.write(bib)
         marker = bibformatter.reference_marker(ref)
-        print "\n<span title=\"#{marker}\"><b>[#{rec[:refnum]}]</b></span> #{text}<br />\n"
+        print "\n<span title=\"#{marker}\"><b><a name=\"[#{rec[:refnum]}]\">[#{rec[:refnum]}]</name></b></span> #{text}<br />\n"
       end
     end
     next
@@ -108,11 +108,11 @@ lines.each do |line|
         refnum-1
       else
         citations[tag][:count] += 1
-        refnum
+        citations[tag][:refnum]
       end
     }
     repl = "\\cite{"+tags+"}"
-    nline.sub!(repl,"<span title=\"#{tags}\"><b>[#{result.join(',')}]</b></span>")
+    nline.sub!(repl,"<span title=\"#{tags}\"><b><a href=\"##{result}\">[#{result.join(',')}]</a></b></span>")
 
     count += 1
     break if count>100 # prevent endless loops if non-resolved
