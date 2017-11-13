@@ -184,6 +184,10 @@ module BibOutput
     str2
   end
 
+  def convert_special_characters s
+    s.gsub('\"{o}',"&ouml;").gsub("~","&nbsp;").gsub('\"{u}',"&uuml;").gsub("\`{e}","&egrave;")
+  end
+
   def edition e
     e
   end
@@ -303,7 +307,7 @@ class BibSpringerFormatter
     end
     text = text.strip
     text = text.chop if text =~ /[,.]$/
-    text+newline
+    convert_special_characters(text)+newline
   end
 
   def to_authorlist s

@@ -105,10 +105,11 @@ lines.each do |line|
       if !citations[tag]
         citations[tag] = { refnum: refnum, count: 1 }
         refnum += 1
+        refnum-1
       else
         citations[tag][:count] += 1
+        refnum
       end
-      refnum
     }
     repl = "\\cite{"+tags+"}"
     nline.sub!(repl,"<span title=\"#{tags}\"><b>[#{result.join(',')}]</b></span>")

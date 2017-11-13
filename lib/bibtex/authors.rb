@@ -12,7 +12,7 @@ module FormatBibAuthors
     authors = []
     if list.kind_of?(String)
       if list =~ / and / or list =~ /\./
-        strip_bibtex(list).split(/ and /).each do | s |
+        list.split(/ and /).each do | s |
           s2 =
             if s !~ /,/
               # No comma!
@@ -31,7 +31,7 @@ module FormatBibAuthors
         end
       else
         # Looks like misformed 'Ball MP'
-        strip_bibtex(list).split(/, /).each do | s |
+        list.split(/, /).each do | s |
           last,first = s.split(/\s+/,2)
           firsts = first.split(//).join(". ")+"."
           # $stderr.print firsts, "\n"
