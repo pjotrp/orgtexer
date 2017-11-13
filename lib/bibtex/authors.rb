@@ -33,6 +33,8 @@ module FormatBibAuthors
         # Looks like misformed 'Ball MP'
         list.split(/, /).each do | s |
           last,first = s.split(/\s+/,2)
+          raise "Can not parse <#{s}>" if first == nil
+          return last if last == "others" or last == "{others}"
           firsts = first.split(//).join(". ")+"."
           # $stderr.print firsts, "\n"
           authors.push last + ', '+firsts
