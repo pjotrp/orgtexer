@@ -317,10 +317,13 @@ class BibSpringerFormatter
               braces(bib[:Number],false)+dot(pages("#{bib.required(:Pages)}"))+'.'
     else
       # this is used mostly:
-      text += dot(strip_bibtex(capitalize_first(bib[:Title])))+dot(bib[:Journal])+bib[:Volume]+braces(bib[:Number])+prefix_colon(bib[:Pages],false)+'.'
+      text += dot(strip_bibtex(capitalize_first(bib[:Title])))+dot(bib[:Journal])+bib[:Volume]+braces(bib[:Number])+prefix_colon(bib[:Pages],false)
+      text += '.' if bib.type!='misc'
+    end
+    if bib.type=='misc' or !@style[:final]
+      text += url(bib[:Doi],bib[:Url],true)
     end
     if !@style[:final]
-      text += url(bib[:Doi],bib[:Url],true)
       text += citations(bib)
     end
     text = text.strip
