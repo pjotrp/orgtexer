@@ -9,10 +9,11 @@ require 'orgtexer'
 require 'bibtex'
 require 'bibtex/bibformatters'
 
-ORGTEXER_VERSION = File.dirname(File.dirname(__FILE__))+'/VERSION'
-ORGTEXER_SHOW = 'BibTexOrg '+File.new(ORGTEXER_VERSION).read+' by Pjotr Prins (c) 2017'
+Encoding.default_external = Encoding::UTF_8
 
-bib_style = {}
+ORGTEXER_VERSION = File.dirname(File.dirname(__FILE__))+'/VERSION'
+ORGTEXER_SHOW = 'BibTexOrg '+File.new(ORGTEXER_VERSION).read+' by Pjotr Prins (c) 2017,2018'
+
 style = { format: :springer}
 
 options = OpenStruct.new()
@@ -32,6 +33,10 @@ EXAMPLE
 
   opts.on("-q", "--quiet", "Run quietly") do |q|
     options.quiet = q
+  end
+
+  opts.on("--final", "Final output (no DOI)") do |t|
+    style[:final] = true
   end
 
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
@@ -62,8 +67,9 @@ ARGV.each do | fn |
     end
     next
   end
-  File.open(fn,"r:iso-8859-1:utf-8",&:read).each_line do | s |
+  File.open(fn,"r:utf-8",&:read).each_line do | s |
     lines << s;
+    # p s
   end
 end
 

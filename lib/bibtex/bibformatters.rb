@@ -138,6 +138,15 @@ module BibOutput
     ""
   end
 
+  def prefix_colon str, space=true
+    if str!=nil and str.strip != ''
+      c = ''
+      c = ' ' if space
+      return ':' + str.rstrip + c
+    end
+    ""
+  end
+
   def comma str
     if str!=nil and str.strip != ''
       return str.rstrip + ', '
@@ -147,7 +156,7 @@ module BibOutput
 
   def braces str
     if str!=nil and str.strip != ''
-      return ' (' + str.strip + ')'
+      return '(' + str.strip + ')'
     end
     ""
   end
@@ -155,6 +164,13 @@ module BibOutput
   def dot str
     if str!=nil and str.strip != ''
       return str.rstrip + '. '
+    end
+    ""
+  end
+
+  def prefix_dot str
+    if str!=nil and str.strip != ''
+      return '.' + str.rstrip + ' '
     end
     ""
   end
@@ -192,13 +208,13 @@ module BibOutput
     e
   end
 
-  def pages p
-    return '' if p == nil or p.strip == ''
+  def pages pg
+    return '' if pg == nil or pg.strip == ''
 
-    if p !~ /-/ and p !~ /:/
-      return p + 'p'
+    if pg !~ /-/ and pg !~ /:/
+      return pg + 'p'
     end
-    p
+    pg.strip
   end
 
 end
@@ -297,12 +313,14 @@ class BibSpringerFormatter
       text += comma(bib[:Organization])+dot(pages(bib[:Pages]))
     elsif bib.type == 'journal'
       # Journal article
-      text += dot(strip_bibtex(capitalize_first(bib.required(:Title))))+dot(bib.required(:Journal))+colon(bib[:Volume],false)+dot(pages("#{bib.required(:Pages)}"))
+      text += dot(strip_bibtex(capitalize_first(bib.required(:Title))))+dot(bib.required(:Journal))+colon(bib[:Volume],false)+
+              braces(bib[:Number],false)+dot(pages("#{bib.required(:Pages)}"))+'.'
     else
-      text += dot(strip_bibtex(capitalize_first(bib[:Title])))+dot(bib[:Journal])+colon(bib[:Volume],false)+dot(pages("#{bib[:Pages]}"))
+      # this is used mostly:
+      text += dot(strip_bibtex(capitalize_first(bib[:Title])))+dot(bib[:Journal])+bib[:Volume]+braces(bib[:Number])+prefix_colon(bib[:Pages],false)+'.'
     end
-    text += url(bib[:Doi],bib[:Url],true)
     if !@style[:final]
+      text += url(bib[:Doi],bib[:Url],true)
       text += citations(bib)
     end
     text = text.strip

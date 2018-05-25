@@ -1,12 +1,12 @@
 * ORGTeXer
 
-Processor for org-mode - this is Org with TeX mixed in. Actually
-it is more than that. I have come to realise that we need front-ends
-for processing markdown, Org and all that, and 'knowledgeable'
-back-ends that can target either TeX or HTML. And the front-end can
-act based on knowledge of the target. Either that or create a very
-smart Tex -> HTML converter, something no one has achieved in a
-satisfactory way (that I am aware).
+Processor for org-mode - this is Org with TeX mixed in. Actually it is
+more than that. I have come to realise that we need front-ends for
+processing markdown, Org and all that, and 'knowledgeable' back-ends
+that can target either TeX or HTML. And the front-end can act based on
+knowledge of the target. Either that or create a very smart Tex ->
+HTML converter, something no one has achieved in a satisfactory way
+(that I am aware).
 
 The reason for this processor is that I often write text in Emacs Org
 mode (before it was Markdown or WikiTeXer with vim) and usually want
