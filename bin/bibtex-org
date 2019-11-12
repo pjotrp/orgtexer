@@ -35,12 +35,21 @@ EXAMPLE
     options.quiet = q
   end
 
+  opts.on("--format style",[:springer,:nih,:nrg], "Set style") do |format|
+    p ["*",format]
+    style[:format] = format
+  end
+
   opts.on("--final", "Final output (no DOI)") do |t|
     style[:final] = true
   end
 
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     options.verbose = v
+  end
+
+  opts.on("--[no-]links", "No URLS") do |u|
+    options.links = u
   end
 
   opts.on("-t", "--[no-]trace", "Debug") do |t|
@@ -75,7 +84,7 @@ end
 
 class HTMLwriter
   def bold s
-    "<b>"+s+"</b"
+    "<b>"+s+"</b>"
   end
 end
 
@@ -118,8 +127,11 @@ lines.each do |line|
       end
     }
     repl = "\\cite{"+tags+"}"
-    nline.sub!(repl,"<span title=\"#{tags}\"><b><a href=\"##{result}\">[#{result.join(',')}]</a></b></span>")
-
+    if options.links
+      nline.sub!(repl,"<span title=\"#{tags}\"><b><a href=\"##{result}\">[#{result.join(',')}]</a></b></span>")
+    else
+      nline.sub!(repl,"<sup>#{result.join(',')}</sup>")
+    end
     count += 1
     break if count>100 # prevent endless loops if non-resolved
   end

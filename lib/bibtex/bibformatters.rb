@@ -7,6 +7,8 @@ module BibFormatter
     case style[:format]
       when :nrg
         BibNRGFormatter.new(writer, style)
+      when :nih
+        BibNIHFormatter.new(writer, style)
       when :springer
         BibSpringerFormatter.new(writer, style)
       else
@@ -322,6 +324,75 @@ class BibSpringerFormatter
     end
     if bib.type=='misc' or !@style[:final]
       text += url(bib[:Doi],bib[:Url],true)
+    end
+    if !@style[:final]
+      text += citations(bib)
+    end
+    text = text.strip
+    text = text.chop if text =~ /[,.]$/
+    convert_special_characters(text)+newline
+  end
+
+  def to_authorlist s
+    list = split_bib_authors(s)
+    list = list.map do | a |
+      first,last = split_first_lastname(a)
+      if first !~ /\./
+        $stderr.print "Possibly malformed first name <#{first.strip}> has no dot in <",a,">\n"
+      end
+      if first =~ /\w\w/
+        $stderr.print "Possibly malformed first name <#{first.strip}> contains two+ letters in ref <",a,">\n"
+      end
+      a1 = last+' '+to_initials(first)
+      a2 = a1.gsub(/[,.]/,' ')
+      # $stderr.print a," <--\n"
+      a2.strip
+    end
+    list
+  end
+end
+
+class BibNIHFormatter
+  include BibOutput
+  include BibDefaultOutput
+
+  def initialize writer, style
+    @writer = writer
+    @style = style
+    style[:max_authors] ||= 3
+  end
+
+  def cite_marker num
+    @writer.bold(@writer.italics("(#{num.to_s})"))
+  end
+
+  def write bib
+    text = authors(to_authorlist(bib[:Author]), :etal=>:plain, :etal_num => 3, :amp=>true)
+    if bib.type == 'book' or bib.type == 'incollection' or bib.type == 'inproceedings' or bib.type == 'conference'
+      text += strip_bibtex(dot(capitalize_first(bib.required(:Title))))+comma(bib[:Booktitle])+dot(edition(bib[:Edition]))
+      if bib.type == 'book'
+        text += comma(bib.required(:Publisher))
+      else
+        text += comma(bib[:Publisher])
+      end
+      text += comma(bib[:Organization])+dot(pages(bib[:Pages]))
+    elsif bib.type == 'journal'
+      # Journal article
+      text += dot(strip_bibtex(capitalize_first(bib.required(:Title))))+bib.required(:Journal)+colon(bib[:Volume],false)+
+              braces(bib[:Number],false)+dot(pages("#{bib.required(:Pages)}"))
+    else
+      # this is used mostly:
+      text += dot(strip_bibtex(capitalize_first(bib[:Title])))+dot(bold(bib[:Journal]))+bib[:Volume]+braces(bib[:Number])+prefix_colon(bib[:Pages],false)
+      # text += '.' if bib.type!='misc'
+    end
+    text += ' '+braces(bib[:Year])
+    if bib[:Url]
+      text += " PMID:"+bib[:Url].split("/").last
+    else
+      if bib.type=='misc' or !@style[:final]
+        # text += url(bib[:Doi],bib[:Url],true)
+        text += ' '+bib[:Doi]
+      end
     end
     if !@style[:final]
       text += citations(bib)
