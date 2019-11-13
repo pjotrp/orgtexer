@@ -367,7 +367,7 @@ class BibNIHFormatter
   end
 
   def write bib
-    text = authors(to_authorlist(bib[:Author]), :etal=>:plain, :etal_num => 3, :amp=>true)
+    text = authors(to_authorlist(bib[:Author]), :etal=>false, :amp=>true)
     if bib.type == 'book' or bib.type == 'incollection' or bib.type == 'inproceedings' or bib.type == 'conference'
       text += strip_bibtex(dot(capitalize_first(bib.required(:Title))))+comma(bib[:Booktitle])+dot(edition(bib[:Edition]))
       if bib.type == 'book'
@@ -386,12 +386,12 @@ class BibNIHFormatter
       # text += '.' if bib.type!='misc'
     end
     text += ' '+braces(bib[:Year])
-    if bib[:Url]
+    if bib[:Url] and bib[:URL] =~ /pubmed/
       text += " PMID:"+bib[:Url].split("/").last
     else
       if bib.type=='misc' or !@style[:final]
         # text += url(bib[:Doi],bib[:Url],true)
-        text += ' '+bib[:Doi]
+        text += ' '+bib[:Doi]+bib[:howPublished]
       end
     end
     if !@style[:final]
